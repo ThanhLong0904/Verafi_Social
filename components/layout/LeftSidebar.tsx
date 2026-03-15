@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import { useCreatePostModal } from "@/components/providers/CreatePostModalProvider";
 
 type NavItem = {
   key: string;
@@ -117,6 +118,7 @@ function IconMenu(props: { className?: string }) {
 
 export default function LeftSidebar() {
   const pathname = usePathname();
+  const { openModal } = useCreatePostModal();
 
   const navItems: NavItem[] = [
     {
@@ -181,6 +183,25 @@ export default function LeftSidebar() {
                 ? item.match(pathname)
                 : pathname === item.href;
 
+              // Handle Create button separately to open modal
+              if (item.key === "create") {
+                return (
+                  <button
+                    key={item.key}
+                    onClick={openModal}
+                    className={clsx(
+                      "flex items-center justify-center p-3 transition-colors",
+                      isActive
+                        ? "text-foreground"
+                        : "text-muted hover:text-foreground",
+                    )}
+                    title={item.label}
+                  >
+                    {item.icon}
+                  </button>
+                );
+              }
+
               return (
                 <Link
                   key={item.key}
@@ -220,6 +241,24 @@ export default function LeftSidebar() {
               ? item.match(pathname)
               : pathname === item.href;
 
+            // Handle Create button separately to open modal
+            if (item.key === "create") {
+              return (
+                <button
+                  key={item.key}
+                  onClick={openModal}
+                  className={clsx(
+                    "flex flex-col items-center justify-center gap-0.5 px-3 py-2 transition-colors",
+                    isActive
+                      ? "text-foreground"
+                      : "text-muted hover:text-foreground",
+                  )}
+                >
+                  {item.icon}
+                </button>
+              );
+            }
+
             return (
               <Link
                 key={item.key}
@@ -252,8 +291,8 @@ export default function LeftSidebar() {
       </nav>
 
       {/* Floating Create Button (Mobile) */}
-      <Link
-        href="/create"
+      <button
+        onClick={openModal}
         className="lg:hidden fixed bottom-20 right-5 z-40 w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center hover:scale-105 active:scale-95 transition-transform duration-150"
         aria-label="Create post"
       >
@@ -269,7 +308,7 @@ export default function LeftSidebar() {
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
-      </Link>
+      </button>
     </>
   );
 }

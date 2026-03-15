@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useCreatePostModal } from "@/components/providers/CreatePostModalProvider";
 
 interface CreatePostBoxProps {
   userAvatar?: string;
@@ -11,12 +11,12 @@ export default function CreatePostBox({
   userAvatar,
   userName,
 }: CreatePostBoxProps) {
-  const router = useRouter();
+  const { openModal } = useCreatePostModal();
 
   return (
     <div
       className="border-b border-border/40 py-4 px-4 hover:bg-white/[0.02] transition-colors cursor-pointer"
-      onClick={() => router.push("/create")}
+      onClick={openModal}
     >
       <div className="flex gap-3">
         {/* Avatar */}
@@ -49,7 +49,7 @@ export default function CreatePostBox({
             className="text-sm font-semibold text-muted hover:text-foreground transition-colors px-4 py-1.5 rounded-lg border border-border/40 hover:border-border"
             onClick={(e) => {
               e.stopPropagation();
-              router.push("/create");
+              openModal();
             }}
           >
             Post
