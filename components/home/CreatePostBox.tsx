@@ -14,11 +14,11 @@ export default function CreatePostBox({
   const router = useRouter();
 
   return (
-    <div className="border-b border-border/40 py-4 px-4 hover:bg-white/[0.02] transition-colors cursor-pointer">
-      <div
-        className="flex gap-3 max-w-[630px] mx-auto"
-        onClick={() => router.push("/create")}
-      >
+    <div
+      className="border-b border-border/40 py-4 px-4 hover:bg-white/[0.02] transition-colors cursor-pointer"
+      onClick={() => router.push("/create")}
+    >
+      <div className="flex gap-3">
         {/* Avatar */}
         <div className="flex-shrink-0">
           <div className="w-9 h-9 rounded-full bg-surface/80 border border-border/40 overflow-hidden flex items-center justify-center">

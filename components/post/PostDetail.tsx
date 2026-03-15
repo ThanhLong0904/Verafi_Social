@@ -1,107 +1,107 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Post, Comment } from '@/types'
-import { formatDate } from '@/lib/utils'
-import Link from 'next/link'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Post, Comment } from "@/types";
+import { formatDate } from "@/lib/utils";
+import Link from "next/link";
 
 interface PostDetailProps {
-  postId: string
+  postId: string;
 }
 
 export default function PostDetail({ postId }: PostDetailProps) {
-  const [post, setPost] = useState<Post | null>(null)
-  const [comments, setComments] = useState<Comment[]>([])
-  const [newComment, setNewComment] = useState('')
-  const [isLiked, setIsLiked] = useState(false)
-  const [likesCount, setLikesCount] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [submittingComment, setSubmittingComment] = useState(false)
-  const router = useRouter()
+  const [post, setPost] = useState<Post | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchPost()
-    fetchComments()
-  }, [postId])
+    fetchPost();
+    fetchComments();
+  }, [postId]);
 
   const fetchPost = async () => {
     try {
-      const response = await fetch(`/api/posts/${postId}`)
+      const response = await fetch(`/api/posts/${postId}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch post')
+        throw new Error("Failed to fetch post");
       }
-      const data = await response.json()
-      setPost(data.post)
-      setIsLiked(data.post.is_liked || false)
-      setLikesCount(data.post.likes_count || 0)
+      const data = await response.json();
+      setPost(data.post);
+      setIsLiked(data.post.is_liked || false);
+      setLikesCount(data.post.likes_count || 0);
     } catch (error) {
-      console.error('Error fetching post:', error)
+      console.error("Error fetching post:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`/api/posts/${postId}/comments`)
+      const response = await fetch(`/api/posts/${postId}/comments`);
       if (!response.ok) {
-        throw new Error('Failed to fetch comments')
+        throw new Error("Failed to fetch comments");
       }
-      const data = await response.json()
-      setComments(data.comments || [])
+      const data = await response.json();
+      setComments(data.comments || []);
     } catch (error) {
-      console.error('Error fetching comments:', error)
+      console.error("Error fetching comments:", error);
     }
-  }
+  };
 
   const handleLike = async () => {
     try {
       const response = await fetch(`/api/posts/${postId}/like`, {
-        method: isLiked ? 'DELETE' : 'POST',
-      })
+        method: isLiked ? "DELETE" : "POST",
+      });
 
       if (response.ok) {
-        setIsLiked(!isLiked)
-        setLikesCount(prev => isLiked ? prev - 1 : prev + 1)
+        setIsLiked(!isLiked);
+        setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
       }
     } catch (error) {
-      console.error('Error toggling like:', error)
+      console.error("Error toggling like:", error);
     }
-  }
+  };
 
   const handleSubmitComment = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newComment.trim() || submittingComment) return
+    e.preventDefault();
+    if (!newComment.trim() || submittingComment) return;
 
-    setSubmittingComment(true)
+    setSubmittingComment(true);
     try {
       const response = await fetch(`/api/posts/${postId}/comments`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ content: newComment }),
-      })
+      });
 
       if (response.ok) {
-        const data = await response.json()
-        setComments(prev => [...prev, data.comment])
-        setNewComment('')
+        const data = await response.json();
+        setComments((prev) => [...prev, data.comment]);
+        setNewComment("");
       }
     } catch (error) {
-      console.error('Error submitting comment:', error)
+      console.error("Error submitting comment:", error);
     } finally {
-      setSubmittingComment(false)
+      setSubmittingComment(false);
     }
-  }
+  };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-strong"></div>
       </div>
-    )
+    );
   }
 
   if (!post) {
@@ -109,21 +109,21 @@ export default function PostDetail({ postId }: PostDetailProps) {
       <div className="text-center py-12">
         <p className="text-muted">Post not found</p>
         <button
-          onClick={() => router.push('/')}
+          onClick={() => router.push("/")}
           className="mt-4 px-4 py-2 brand-gradient rounded-lg"
         >
           Go Home
         </button>
       </div>
-    )
+    );
   }
 
   const detailAspectRatio = (() => {
-    const w = post.media_width
-    const h = post.media_height
-    if (!w || !h || w <= 0 || h <= 0) return 1
-    return w / h
-  })()
+    const w = post.media_width;
+    const h = post.media_height;
+    if (!w || !h || w <= 0 || h <= 0) return 1;
+    return w / h;
+  })();
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4">
@@ -139,14 +139,18 @@ export default function PostDetail({ postId }: PostDetailProps) {
               />
             ) : (
               <span className="text-sm text-muted">
-                {(post.user?.display_name || post.user?.username || 'U')[0].toUpperCase()}
+                {(post.user?.display_name ||
+                  post.user?.username ||
+                  "U")[0].toUpperCase()}
               </span>
             )}
           </div>
           <div className="flex-1">
             <Link href={`/profile/${post.user_id}`}>
               <h3 className="font-semibold hover:underline">
-                {post.user?.display_name || post.user?.username || 'Unknown User'}
+                {post.user?.display_name ||
+                  post.user?.username ||
+                  "Unknown User"}
               </h3>
             </Link>
             <p className="text-sm text-muted">{formatDate(post.created_at)}</p>
@@ -156,17 +160,17 @@ export default function PostDetail({ postId }: PostDetailProps) {
         {/* Media */}
         <div
           className="relative w-full bg-black/80 overflow-hidden"
-          style={{ aspectRatio: String(detailAspectRatio), maxHeight: '80vh' }}
+          style={{ aspectRatio: String(detailAspectRatio), maxHeight: "80vh" }}
         >
-          {post.file_type === 'image' ? (
+          {post.file_type === "image" ? (
             <img
               src={post.shelby_file_url}
-              alt={post.caption || 'Post image'}
+              alt={post.caption || "Post image"}
               className="h-full w-full object-contain"
               loading="lazy"
               decoding="async"
               onError={(e) => {
-                e.currentTarget.src = '/placeholder-image.svg'
+                e.currentTarget.src = "/placeholder-image.svg";
               }}
             />
           ) : (
@@ -185,12 +189,12 @@ export default function PostDetail({ postId }: PostDetailProps) {
             <button
               onClick={handleLike}
               className={`transition-colors ${
-                isLiked ? 'text-pink-400' : 'text-muted hover:text-pink-400'
+                isLiked ? "text-pink-400" : "text-muted hover:text-pink-400"
               }`}
             >
               <svg
                 className="w-6 h-6"
-                fill={isLiked ? 'currentColor' : 'none'}
+                fill={isLiked ? "currentColor" : "none"}
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
@@ -214,7 +218,9 @@ export default function PostDetail({ postId }: PostDetailProps) {
             <div className="mb-1 text-sm leading-snug">
               <Link href={`/profile/${post.user_id}`}>
                 <span className="font-semibold hover:underline">
-                  {post.user?.display_name || post.user?.username || 'Unknown User'}
+                  {post.user?.display_name ||
+                    post.user?.username ||
+                    "Unknown User"}
                 </span>
               </Link>
               <span className="ml-2 text-foreground/90">{post.caption}</span>
@@ -229,10 +235,14 @@ export default function PostDetail({ postId }: PostDetailProps) {
                   <div key={comment.id} className="flex gap-2">
                     <Link href={`/profile/${comment.user_id}`}>
                       <span className="font-semibold hover:underline text-sm">
-                        {comment.user?.display_name || comment.user?.username || 'Unknown User'}
+                        {comment.user?.display_name ||
+                          comment.user?.username ||
+                          "Unknown User"}
                       </span>
                     </Link>
-                    <span className="text-sm text-foreground/90">{comment.content}</span>
+                    <span className="text-sm text-foreground/90">
+                      {comment.content}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -256,12 +266,12 @@ export default function PostDetail({ postId }: PostDetailProps) {
                 disabled={!newComment.trim() || submittingComment}
                 className="px-4 py-2 bg-gradient-to-r from-emerald-400 to-sky-400 text-slate-950 rounded-xl hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm text-xs font-medium"
               >
-                {submittingComment ? 'Posting...' : 'Post'}
+                {submittingComment ? "Posting..." : "Post"}
               </button>
             </form>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

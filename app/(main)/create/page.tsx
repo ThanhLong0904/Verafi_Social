@@ -12,9 +12,9 @@ export default async function CreatePostPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-[630px] mx-auto px-4 pt-6 pb-24">
-        <header className="mb-6 border-b border-border/40 pb-4">
+        {/* <header className="mb-6 border-b border-border/40 pb-4">
           <h1 className="text-xl font-semibold">New post</h1>
-        </header>
+        </header> */}
         <CreatePostClient />
       </div>
     </div>
