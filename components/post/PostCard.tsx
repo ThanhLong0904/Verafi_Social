@@ -1,194 +1,210 @@
-'use client'
+"use client";
 
-import { useMemo, useState } from 'react'
-import { Post } from '@/types'
-import { formatDate } from '@/lib/utils'
-import Link from 'next/link'
+import { useState } from "react";
+import { Post } from "@/types";
+import { formatDate } from "@/lib/utils";
+import Link from "next/link";
 
 interface PostCardProps {
-  post: Post
+  post: Post;
 }
 
 export default function PostCard({ post }: PostCardProps) {
-  const [isLiked, setIsLiked] = useState(post.is_liked || false)
-  const [likesCount, setLikesCount] = useState(post.likes_count || 0)
-  const [showTapHeart, setShowTapHeart] = useState(false)
-
-  // IG/FB clamp feed aspect ratio to avoid extremely tall/wide media taking over the viewport.
-  // Min: 4:5 (0.8) – Max: 1.91:1
-  const feedAspectRatio = useMemo(() => {
-    const w = post.media_width
-    const h = post.media_height
-    if (!w || !h || w <= 0 || h <= 0) return 1 // square fallback
-    const raw = w / h
-    return Math.min(1.91, Math.max(0.8, raw))
-  }, [post.media_width, post.media_height])
+  const [isLiked, setIsLiked] = useState(post.is_liked || false);
+  const [likesCount, setLikesCount] = useState(post.likes_count || 0);
 
   const handleLike = async () => {
     try {
       const response = await fetch(`/api/posts/${post.id}/like`, {
-        method: isLiked ? 'DELETE' : 'POST',
-      })
+        method: isLiked ? "DELETE" : "POST",
+      });
 
       if (response.ok) {
-        setIsLiked(!isLiked)
-        setLikesCount(prev => isLiked ? prev - 1 : prev + 1)
+        setIsLiked(!isLiked);
+        setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
       }
     } catch (error) {
-      console.error('Error toggling like:', error)
+      console.error("Error toggling like:", error);
     }
-  }
-
-  const handleDoubleTap = () => {
-    if (!isLiked) {
-      void handleLike()
-    }
-    setShowTapHeart(true)
-    window.setTimeout(() => setShowTapHeart(false), 260)
-  }
+  };
 
   return (
-    <article className="glass-card overflow-hidden transition-all duration-300 ease-out max-w-[680px] mx-auto">
-      {/* Header */}
-      <div className="px-4 py-3 flex items-center gap-3">
-        <div className="w-10 h-10 bg-surface-2/80 border border-border rounded-full flex items-center justify-center overflow-hidden">
-          {post.user?.avatar_url ? (
-            <img
-              src={post.user.avatar_url}
-              alt={post.user.display_name || post.user.username}
-              className="w-full h-full rounded-full object-cover"
-            />
-          ) : (
-            <span className="text-sm text-muted">
-              {(post.user?.display_name || post.user?.username || 'U')[0].toUpperCase()}
-            </span>
-          )}
-        </div>
-        <div className="flex-1">
-          <Link href={`/profile/${post.user_id}`}>
-            <h3 className="font-semibold hover:underline">
-              {post.user?.display_name || post.user?.username || 'Unknown User'}
-            </h3>
-          </Link>
-          <p className="text-xs text-muted">{formatDate(post.created_at)}</p>
-        </div>
-      </div>
-
-      {/* Media */}
-      <Link href={`/post/${post.id}`}>
-        <div
-          className="relative w-full max-w-[680px] mx-auto bg-black/70 overflow-hidden"
-          style={{ aspectRatio: String(feedAspectRatio), maxHeight: '80vh' }}
-          onDoubleClick={handleDoubleTap}
-        >
-          {post.file_type === 'image' ? (
-            <img
-              src={post.shelby_file_url}
-              alt={post.caption || 'Post image'}
-              className="h-full w-full object-cover"
-              loading="lazy"
-              decoding="async"
-              onError={(e) => {
-                e.currentTarget.src = '/placeholder-image.svg'
-              }}
-            />
-          ) : (
-            <video
-              src={post.shelby_file_url}
-              controls
-              className="h-full w-full object-cover"
-              preload="metadata"
-            />
-          )}
-
-          {/* Double-tap heart micro interaction */}
-          {showTapHeart && (
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div className="animate-[tapHeart_260ms_ease-out_forwards] text-pink-400 drop-shadow-[0_0_30px_rgba(244,114,182,0.9)]">
-                <svg
-                  className="w-20 h-20"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M4.318 6.318a4.5 4.5 0 0 0 0 6.364L12 20.364l7.682-7.682a4.5 4.5 0 0 0-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 0 0-6.364 0Z" />
-                </svg>
-              </div>
-            </div>
-          )}
-        </div>
-      </Link>
-
-      {/* Actions */}
-      <div className="px-4 py-3 space-y-2">
-        <div className="flex items-center gap-4 mb-2">
-          <button
-            onClick={handleLike}
-            className={`transition-colors ${
-              isLiked ? 'text-pink-400' : 'text-muted hover:text-pink-400'
-            }`}
-          >
-            <svg
-              className="w-6 h-6"
-              fill={isLiked ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+    <article className="border-b border-border/40 py-4 px-4 hover:bg-white/[0.02] transition-colors">
+      <div className="flex gap-3 max-w-[630px] mx-auto">
+        {/* Avatar */}
+        <Link href={`/profile/${post.user_id}`} className="flex-shrink-0">
+          <div className="w-9 h-9 rounded-full bg-surface/80 border border-border/40 overflow-hidden flex items-center justify-center">
+            {post.user?.avatar_url ? (
+              <img
+                src={post.user.avatar_url}
+                alt={post.user.display_name || post.user.username}
+                className="w-full h-full object-cover"
               />
-            </svg>
-          </button>
-          <Link href={`/post/${post.id}`}>
-            <button className="text-muted hover:text-brand-strong transition-colors">
+            ) : (
+              <span className="text-xs text-muted font-medium">
+                {(post.user?.display_name ||
+                  post.user?.username ||
+                  "U")[0].toUpperCase()}
+              </span>
+            )}
+          </div>
+        </Link>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <Link href={`/profile/${post.user_id}`}>
+                <span className="font-semibold text-[15px] hover:underline">
+                  {post.user?.display_name || post.user?.username || "Unknown"}
+                </span>
+              </Link>
+              <span className="text-muted text-sm">
+                {formatDate(post.created_at)}
+              </span>
+            </div>
+            <button className="text-muted hover:text-foreground p-1 -mr-1">
               <svg
-                className="w-6 h-6"
+                className="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                strokeWidth="2"
+              >
+                <circle cx="12" cy="5" r="1.5" />
+                <circle cx="12" cy="12" r="1.5" />
+                <circle cx="12" cy="19" r="1.5" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Caption */}
+          {post.caption && (
+            <div className="text-[15px] leading-[1.4] mb-3 text-foreground/95 break-words">
+              {post.caption}
+            </div>
+          )}
+
+          {/* Media */}
+          {post.shelby_file_url && (
+            <Link href={`/post/${post.id}`} className="block mb-3">
+              <div className="rounded-xl overflow-hidden border border-border/40 bg-black/5">
+                {post.file_type === "image" ? (
+                  <img
+                    src={post.shelby_file_url}
+                    alt={post.caption || "Post image"}
+                    className="w-full h-auto object-cover"
+                    loading="lazy"
+                    style={{ maxHeight: "500px" }}
+                    onError={(e) => {
+                      e.currentTarget.src = "/placeholder-image.svg";
+                    }}
+                  />
+                ) : (
+                  <video
+                    src={post.shelby_file_url}
+                    controls
+                    className="w-full h-auto"
+                    preload="metadata"
+                    style={{ maxHeight: "500px" }}
+                  />
+                )}
+              </div>
+            </Link>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center gap-1 -ml-2">
+            {/* Like */}
+            <button
+              onClick={handleLike}
+              className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors group"
+            >
+              <svg
+                className={`w-5 h-5 transition-colors ${
+                  isLiked
+                    ? "text-pink-500 fill-pink-500"
+                    : "text-muted group-hover:text-pink-400"
+                }`}
+                fill={isLiked ? "currentColor" : "none"}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+              {likesCount > 0 && (
+                <span className="text-[13px] text-muted group-hover:text-foreground">
+                  {likesCount}
+                </span>
+              )}
+            </button>
+
+            {/* Comment */}
+            <Link href={`/post/${post.id}`}>
+              <button className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors group">
+                <svg
+                  className="w-5 h-5 text-muted group-hover:text-foreground transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
+                </svg>
+                {post.comments_count && post.comments_count > 0 && (
+                  <span className="text-[13px] text-muted group-hover:text-foreground">
+                    {post.comments_count}
+                  </span>
+                )}
+              </button>
+            </Link>
+
+            {/* Repost */}
+            <button className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors group">
+              <svg
+                className="w-5 h-5 text-muted group-hover:text-emerald-400 transition-colors"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                 />
               </svg>
             </button>
-          </Link>
-        </div>
 
-        {/* Likes count */}
-        {likesCount > 0 && (
-          <p className="font-semibold text-xs tracking-wide text-muted-2">
-            {likesCount} likes
-          </p>
-        )}
-
-        {/* Caption */}
-        {post.caption && (
-          <div className="mb-1 text-sm leading-snug">
-            <Link href={`/profile/${post.user_id}`}>
-              <span className="font-semibold hover:underline">
-                {post.user?.display_name || post.user?.username || 'Unknown User'}
-              </span>
-            </Link>
-            <span className="ml-2 text-foreground/90">{post.caption}</span>
-          </div>
-        )}
-
-        {/* Comments count */}
-        {post.comments_count && post.comments_count > 0 && (
-          <Link href={`/post/${post.id}`}>
-            <button className="text-[11px] text-muted hover:text-foreground transition-colors">
-              View all {post.comments_count} comments
+            {/* Share */}
+            <button className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors group">
+              <svg
+                className="w-5 h-5 text-muted group-hover:text-foreground transition-colors"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                />
+              </svg>
             </button>
-          </Link>
-        )}
+          </div>
+        </div>
       </div>
     </article>
-  )
+  );
 }

@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Instagram Clone - Shelby",
-  description: "Instagram clone built with Next.js, Supabase, and Shelby",
+  title: "Verafi Social",
+  description:
+    "A minimal social network built with Next.js, Supabase, and Shelby",
 };
 
 export default function RootLayout({

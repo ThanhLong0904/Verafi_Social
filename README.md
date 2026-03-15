@@ -1,6 +1,6 @@
-# Instagram Clone với Shelby
+# Verafi Social
 
-Ứng dụng Instagram clone được xây dựng với Next.js, Supabase, và Shelby.
+Ứng dụng mạng xã hội được xây dựng với Next.js, Supabase, và Shelby.
 
 ## Công nghệ sử dụng
 
@@ -26,7 +26,7 @@
 ## Cấu trúc dự án
 
 ```
-instagram/
+verafi-social/
 ├── app/                    # Next.js App Router
 │   ├── (auth)/            # Auth routes
 │   │   └── login/         # Login page
@@ -41,7 +41,7 @@ instagram/
 │       ├── posts/         # Posts CRUD
 │       └── users/         # User management
 ├── components/             # React components
-│   ├── auth/              # Auth components
+│   ├── home/              # Home page components
 │   ├── post/              # Post components
 │   ├── profile/           # Profile components
 │   ├── upload/            # Upload components
@@ -106,6 +106,7 @@ Mở [http://localhost:3000](http://localhost:3000) trong browser.
 ## Database Schema
 
 ### Users
+
 - `id`: UUID (primary key)
 - `wallet_address`: TEXT (unique)
 - `username`: TEXT (unique, optional)
@@ -114,6 +115,7 @@ Mở [http://localhost:3000](http://localhost:3000) trong browser.
 - `bio`: TEXT (optional)
 
 ### Posts
+
 - `id`: UUID (primary key)
 - `user_id`: UUID (foreign key to users)
 - `shelby_file_id`: TEXT
@@ -122,17 +124,20 @@ Mở [http://localhost:3000](http://localhost:3000) trong browser.
 - `caption`: TEXT (optional)
 
 ### Likes
+
 - `id`: UUID (primary key)
 - `post_id`: UUID (foreign key to posts)
 - `user_id`: UUID (foreign key to users)
 
 ### Comments
+
 - `id`: UUID (primary key)
 - `post_id`: UUID (foreign key to posts)
 - `user_id`: UUID (foreign key to users)
 - `content`: TEXT
 
 ### Follows
+
 - `id`: UUID (primary key)
 - `follower_id`: UUID (foreign key to users)
 - `following_id`: UUID (foreign key to users)
@@ -140,11 +145,13 @@ Mở [http://localhost:3000](http://localhost:3000) trong browser.
 ## API Routes
 
 ### Authentication
+
 - `POST /api/auth/login` - Login với wallet address
 - `GET /api/auth/login` - Check authentication status
 - `POST /api/auth/logout` - Logout
 
 ### Posts
+
 - `GET /api/posts` - Get all posts (with pagination)
 - `GET /api/posts/[id]` - Get post by ID
 - `DELETE /api/posts/[id]` - Delete post
@@ -154,12 +161,14 @@ Mở [http://localhost:3000](http://localhost:3000) trong browser.
 - `POST /api/posts/[id]/comments` - Create comment
 
 ### Users
+
 - `GET /api/users/[id]` - Get user profile
 - `GET /api/users/[id]/follow` - Check follow status
 - `POST /api/users/[id]/follow` - Follow user
 - `DELETE /api/users/[id]/follow` - Unfollow user
 
 ### Upload
+
 - `POST /api/upload` - Upload file metadata to Supabase (after Shelby upload)
 
 ## Lưu ý
