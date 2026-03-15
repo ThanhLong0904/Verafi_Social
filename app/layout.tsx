@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { WalletProvider } from "@/components/WalletProvider";
 import { Toaster } from "@shelby-protocol/ui/components";
@@ -26,14 +25,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning>
       <head>
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
+        <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `(() => {
   try {
@@ -53,7 +48,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <WalletProvider>
-        {children}
+          {children}
           <Toaster />
         </WalletProvider>
       </body>
