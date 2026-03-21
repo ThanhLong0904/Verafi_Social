@@ -14,7 +14,7 @@ interface UseSubmitFileToChainReturn {
   submitFileToChain: (
     commitment: BlobCommitments,
     file: File,
-    uniqueBlobName: string
+    uniqueBlobName: string,
   ) => Promise<void>;
   isSubmitting: boolean;
   error: string | null;
@@ -36,7 +36,8 @@ export const useSubmitFileToChain = (): UseSubmitFileToChainReturn => {
 
       try {
         // Use high-level API from SDK (recommended by Shelby docs)
-        const expirationMicros = Date.now() * 1000 + 30 * 24 * 60 * 60 * 1000000; // 30 days
+        const expirationMicros =
+          Date.now() * 1000 + 30 * 24 * 60 * 60 * 1000000; // 30 days
 
         const payload = ShelbyBlobClient.createRegisterBlobPayload({
           account: account.address,
@@ -57,7 +58,15 @@ export const useSubmitFileToChain = (): UseSubmitFileToChainReturn => {
           },
         };
 
-        const transactionSubmitted = await signAndSubmitTransaction(transaction);
+        const transactionSubmitted =
+          await signAndSubmitTransaction(transaction);
+
+        console.log("✅ Transaction:", transactionSubmitted.hash);
+        console.log(
+          "View on Aptos Explorer:",
+          `https://explorer.aptoslabs.com/txn/${transactionSubmitted.hash}?network=custom`,
+        );
+        console.log("(Set Custom RPC: https://api.shelbynet.shelby.xyz)");
 
         // Wait for transaction confirmation
         await getAptosClient().waitForTransaction({
@@ -65,17 +74,18 @@ export const useSubmitFileToChain = (): UseSubmitFileToChainReturn => {
         });
       } catch (err) {
         // Handle specific error cases
-        const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
-        
+        const errorMessage =
+          err instanceof Error ? err.message : "An unknown error occurred";
+
         if (errorMessage.includes("INSUFFICIENT_BALANCE")) {
-          const userFriendlyError = 
+          const userFriendlyError =
             "Insufficient APT balance for transaction fees. " +
             "Please fund your wallet with APT tokens from the Shelby faucet: " +
             "https://faucet.shelby.xyz";
           setError(userFriendlyError);
           throw new Error(userFriendlyError);
         }
-        
+
         setError(errorMessage);
         throw err;
       } finally {

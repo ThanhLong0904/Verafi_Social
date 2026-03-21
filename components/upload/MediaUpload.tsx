@@ -114,9 +114,9 @@ export default function MediaUpload({
       const shelbyApiUrl =
         process.env.NEXT_PUBLIC_SHELBY_API_URL ||
         "https://api.shelbynet.shelby.xyz";
-      const fileUrl = `${shelbyApiUrl}/v1/blobs/${account.address.toString()}/${uniqueBlobName}`;
+      const fileUrl = `${shelbyApiUrl}/shelby/v1/blobs/${account.address.toString()}/${encodeURIComponent(uniqueBlobName)}`;
       const fileId = `${account.address.toString()}/${uniqueBlobName}`;
-
+      console.log("📦 Blob URL:", fileUrl);
       // Step 5: Save metadata to Supabase
       setUploadStage("Saving post metadata...");
       setUploadProgress(90);

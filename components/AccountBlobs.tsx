@@ -44,9 +44,7 @@ export const AccountBlobs = ({ refreshTrigger }: AccountBlobsProps) => {
     <div className="border border-border rounded-xl p-6 bg-background">
       {!account && (
         <div className="text-center py-8">
-          <p className="text-muted">
-            Please connect your wallet to view blobs
-          </p>
+          <p className="text-muted">Please connect your wallet to view blobs</p>
         </div>
       )}
       {account && blobs.length === 0 && (
@@ -67,11 +65,9 @@ export const AccountBlobs = ({ refreshTrigger }: AccountBlobsProps) => {
               <div className="h-full relative">
                 {isImageFile(extractFileName(blob.name)) ? (
                   <Image
-                    src={`${
-                      process.env.NEXT_PUBLIC_SHELBY_API_URL || "https://api.shelbynet.shelby.xyz"
-                    }/v1/blobs/${blob.owner.toString()}/${extractFileName(
-                      blob.name,
-                    )}`}
+                    src={`$
+                      {process.env.NEXT_PUBLIC_SHELBY_API_URL || "https://api.shelbynet.shelby.xyz"}
+                    /shelby/v1/blobs/${blob.owner.toString()}/${encodeURIComponent(extractFileName(blob.name))}`}
                     alt={blob.name}
                     style={{
                       width: "100%",
@@ -112,9 +108,7 @@ export const AccountBlobs = ({ refreshTrigger }: AccountBlobsProps) => {
 
               <div className="space-y-2 text-sm">
                 <div>
-                  <span className="text-muted">
-                    Owner:
-                  </span>
+                  <span className="text-muted">Owner:</span>
                   <p className="font-mono text-xs bg-surface-2 p-1 rounded mt-1 break-all">
                     {blob.owner.toString()}
                   </p>
@@ -122,11 +116,9 @@ export const AccountBlobs = ({ refreshTrigger }: AccountBlobsProps) => {
 
                 <div>
                   <a
-                    href={`${
-                      process.env.NEXT_PUBLIC_SHELBY_API_URL || "https://api.shelbynet.shelby.xyz"
-                    }/v1/blobs/${blob.owner.toString()}/${extractFileName(
-                      blob.name,
-                    )}`}
+                    href={`$
+                      {process.env.NEXT_PUBLIC_SHELBY_API_URL || "https://api.shelbynet.shelby.xyz"}
+                    /shelby/v1/blobs/${blob.owner.toString()}/${encodeURIComponent(extractFileName(blob.name))}`}
                     className="block text-brand-strong hover:underline text-xs mt-1 break-all"
                     target="_blank"
                     rel="noopener noreferrer"
